@@ -8,13 +8,6 @@ class Aircraft(models.Model):
     APPROACH = 'APPROACH'
     LANDED = 'LANDED'
 
-    STATE_FLOW = {
-        PARKED: [TAKE_OFF],
-        TAKE_OFF: [AIRBORNE],
-        AIRBORNE: [APPROACH],
-        APPROACH: [LANDED]
-    }
-
     STATUSES = [
         (PARKED, 'Parked'),
         (TAKE_OFF, 'Take-off'),
@@ -32,7 +25,3 @@ class Aircraft(models.Model):
 
     def __str__(self):
         return self.call_sign
-
-    def valid_next_state(self):
-        if self.state in Aircraft.STATE_FLOW.keys():
-            return Aircraft.STATE_FLOW[self.state]

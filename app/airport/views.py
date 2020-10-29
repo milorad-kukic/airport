@@ -33,9 +33,12 @@ class AircraftViewSet(viewsets.GenericViewSet):
 
         if serializer.is_valid():
             try:
-                Aircraft.objects.get(call_sign=call_sign)
+                aircraft = Aircraft.objects.get(call_sign=call_sign)
             except Aircraft.DoesNotExist:
-                Aircraft.objects.create(**serializer.data)
+                aircraft = Aircraft.objects.create(**serializer.data)
+
+            aircraft.state = serializer.data['state']
+            aircraft.save()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
         else:
