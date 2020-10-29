@@ -31,6 +31,7 @@ class AircraftSerializer(serializers.ModelSerializer):
         if valid:
             self.validate_next_state()
             self.validate_empty_runway()
+            self.validate_no_other_approaching()
 
         return valid
 
@@ -57,3 +58,11 @@ class AircraftSerializer(serializers.ModelSerializer):
 
             if on_runway > RUNWAY_CONT - 1:
                 raise ValidationError()
+
+    def validate_no_other_approaching(self):
+        if self.data['state'] == Aircraft.APPROACH:
+            try:
+                Aircraft.objects.get(state=Aircraft.APPROACH)
+                raise ValidationError()
+            except Aircraft.DoesNotExist:
+                pass

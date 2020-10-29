@@ -297,3 +297,19 @@ class AircraftPrivateApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(aircraft.state, 'APPROACH')
+
+    def test_only_one_aircraft_can_be_on_APPROACH(self):
+        Aircraft.objects.create(call_sign='A1', state='APPROACH')
+        aircraft = Aircraft.objects.create(call_sign='A2', state='AIRBORNE')
+
+        payload = {
+            'state': 'APPROACH',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        aircraft.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(aircraft.state, 'AIRBORNE')
