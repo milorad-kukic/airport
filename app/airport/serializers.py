@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -27,14 +29,31 @@ class AircraftSerializer(serializers.ModelSerializer):
         valid = super().is_valid(raise_exception)
 
         if valid:
-            try:
-                aircraft = Aircraft.objects.get(call_sign=self.data['call_sign'])
-
-                valid_next_states = STATE_FLOW.get(aircraft.state)
-
-                if not self.data['state'] in valid_next_states:
-                    raise ValidationError()
-            except Aircraft.DoesNotExist:
-                pass
+            self.validate_next_state()
+            self.validate_empty_runway()
 
         return valid
+
+    def validate_next_state(self):
+        try:
+            aircraft = Aircraft.objects.get(call_sign=self.data['call_sign'])
+
+            valid_next_states = STATE_FLOW.get(aircraft.state)
+
+            if not self.data['state'] in valid_next_states:
+                raise ValidationError()
+        except Aircraft.DoesNotExist:
+            pass
+
+    def validate_empty_runway(self):
+        if self.data['state'] in [Aircraft.TAKE_OFF, Aircraft.LANDED]:
+            on_runway = Aircraft.objects.filter(
+                    state__in=[Aircraft.TAKE_OFF, Aircraft.LANDED]
+            ).count()
+
+            RUNWAY_CONT = 1
+            if settings.AIRPORT_RUNAWAYS:
+                RUNWAY_CONT = settings.AIRPORT_RUNAWAYS
+
+            if on_runway > RUNWAY_CONT - 1:
+                raise ValidationError()

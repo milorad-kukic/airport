@@ -120,3 +120,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AIRPORT_LOCATION = 'Belgrade'
+AIRPORT_RUNAWAYS = 1
+AIRPORT_LARGE_PARKING_SPOTS = 5
+AIRPORT_SMALL_PARKING_SPOTS = 10

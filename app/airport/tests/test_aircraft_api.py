@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -242,3 +242,58 @@ class AircraftPrivateApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(aircraft.state, 'AIRBORNE')
+
+    #################################
+    # TESTS FOR AIRPORT CONSTRAINTS #
+    #################################
+
+    @override_settings(AIRPORT_RUNAWAYS=1)
+    def test_only_one_aircraft_can_be_on_the_runway(self):
+        Aircraft.objects.create(call_sign='A1', state='TAKE_OFF')
+        aircraft = Aircraft.objects.create(call_sign='A2', state='PARKED')
+
+        payload = {
+            'state': 'TAKE_OFF',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        aircraft.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(aircraft.state, 'PARKED')
+
+    @override_settings(AIRPORT_RUNAWAYS=1)
+    def test_APPROACH_cant_go_to_LAND_if_aircraft_on_runway(self):
+        Aircraft.objects.create(call_sign='A1', state='TAKE_OFF')
+        aircraft = Aircraft.objects.create(call_sign='A2', state='APPROACH')
+
+        payload = {
+            'state': 'LANDED',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        aircraft.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(aircraft.state, 'APPROACH')
+
+    @override_settings(AIRPORT_RUNAWAYS=1)
+    def test_APPROACH_cant_go_to_LAND_if_other_aircraft_LANDED(self):
+        Aircraft.objects.create(call_sign='A1', state='LANDED')
+        aircraft = Aircraft.objects.create(call_sign='A2', state='APPROACH')
+
+        payload = {
+            'state': 'LANDED',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        aircraft.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(aircraft.state, 'APPROACH')
