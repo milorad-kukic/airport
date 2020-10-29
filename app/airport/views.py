@@ -24,12 +24,22 @@ class AircraftViewSet(viewsets.GenericViewSet):
         if not request.data.get('public_key', None):
             return Response(None, status=status.HTTP_401_UNAUTHORIZED)
 
-        try:
-            Aircraft.objects.get(call_sign=call_sign)
-        except Aircraft.DoesNotExist:
-            Aircraft.objects.create(call_sign=call_sign)
+        data = {
+            'call_sign': call_sign,
+            'state': request.data.get('state', None)
+        }
 
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
+        serializer = self.get_serializer(data=data)
+
+        if serializer.is_valid():
+            try:
+                Aircraft.objects.get(call_sign=call_sign)
+            except Aircraft.DoesNotExist:
+                Aircraft.objects.create(**serializer.data)
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(None, status=status.HTTP_400_BAD_REQUEST)
 
 
 def public_key_is_valid(public_key_content):

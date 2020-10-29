@@ -78,3 +78,16 @@ class AircraftPrivateApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertIsNone(res.data)
+
+    @patch('airport.views.public_key_is_valid')
+    def test_state_not_passed_return_400_bad_request(self, public_key_is_valid):
+        aircraft = Aircraft.objects.create(call_sign='ABCD')
+        payload = {
+            'public_key': 'valid public key'
+        }
+        public_key_is_valid.return_value = True
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsNone(res.data)
