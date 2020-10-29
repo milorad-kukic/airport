@@ -18,3 +18,8 @@ class AircraftTest(TestCase):
         # check if fails to create same aircraft again
         with self.assertRaises(IntegrityError):
             Aircraft.objects.create(call_sign=CALL)
+
+    def test_should_set_state_to_PARKED_if_not_defined(self):
+        aircraft = Aircraft.objects.create(call_sign='ABCD')
+
+        self.assertEqual(aircraft.state, 'PARKED')
