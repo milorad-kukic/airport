@@ -17,6 +17,10 @@ app.conf.beat_schedule = {
     'every-minute': {
         'task': 'airport.tasks.ground_crew_routine',
         'schedule': 60
+    },
+    'every-5-minuts': {
+        'task': 'weather.tasks.load_weather_data',
+        'schedule': 300
     }
 }
 
