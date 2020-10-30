@@ -8,6 +8,17 @@ from rest_framework import status
 from airport.models import Aircraft
 
 
+def create_aircraft(call_sign, state='PARKED', longitude=0, latitude=0, altitude=0, heading=0):
+    return Aircraft.objects.create(
+        call_sign=call_sign,
+        state=state,
+        longitude=longitude,
+        latitude=latitude,
+        altitude=altitude,
+        heading=heading
+    )
+
+
 class AircraftPrivateApiInvalidKeyTests(TestCase):
 
     def setUp(self):
@@ -68,7 +79,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertIsNone(res.data)
 
     def test_known_aircraft_sends_valid_request_return_204_no_content(self):
-        aircraft = Aircraft.objects.create(call_sign='ABCD')
+        aircraft = create_aircraft(call_sign='ABCD')
         payload = {
             'state': 'TAKE_OFF',
             'public_key': 'valid public key'
@@ -80,7 +91,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertIsNone(res.data)
 
     def test_state_not_passed_return_400_bad_request(self):
-        aircraft = Aircraft.objects.create(call_sign='ABCD')
+        aircraft = create_aircraft(call_sign='ABCD')
         payload = {
             'public_key': 'valid public key'
         }
@@ -95,7 +106,7 @@ class AircraftPrivateApiTests(TestCase):
     ######################################
 
     def test_aircraft_can_switch_state_from_PARKED_to_TAKE_OFF(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='PARKED')
+        aircraft = create_aircraft(call_sign='AB1234', state='PARKED')
         payload = {
             'state': 'TAKE_OFF',
             'public_key': 'valid public key'
@@ -108,7 +119,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'TAKE_OFF')
 
     def test_aircraft_can_switch_state_from_TAKE_OFF_to_AIRBORNE(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='TAKE_OFF')
+        aircraft = create_aircraft(call_sign='AB1234', state='TAKE_OFF')
         payload = {
             'state': 'AIRBORNE',
             'public_key': 'valid public key'
@@ -122,7 +133,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'AIRBORNE')
 
     def test_aircraft_can_switch_state_from_AIRBORNE_to_APPROACH(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='AIRBORNE')
+        aircraft = create_aircraft(call_sign='AB1234', state='AIRBORNE')
         payload = {
             'state': 'APPROACH',
             'public_key': 'valid public key'
@@ -136,7 +147,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'APPROACH')
 
     def test_aircraft_can_switch_state_from_APPROACH_to_LANDED(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='APPROACH')
+        aircraft = create_aircraft(call_sign='AB1234', state='APPROACH')
         payload = {
             'state': 'LANDED',
             'public_key': 'valid public key'
@@ -150,7 +161,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'LANDED')
 
     def test_aircraft_can_switch_state_from_APPROACH_to_AIRBORNE(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='APPROACH')
+        aircraft = create_aircraft(call_sign='AB1234', state='APPROACH')
         payload = {
             'state': 'AIRBORNE',
             'public_key': 'valid public key'
@@ -168,7 +179,7 @@ class AircraftPrivateApiTests(TestCase):
     ########################################
 
     def test_aircraft_cant_switch_state_from_PARKED_to_invalid_state(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='PARKED')
+        aircraft = create_aircraft(call_sign='AB1234', state='PARKED')
         payload = {
             'state': 'INVALID STATE',
             'public_key': 'valid public key'
@@ -182,7 +193,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'PARKED')
 
     def test_PARKED_aircraft_cant_swith_to_other_state_than_TAKE_OFF(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='PARKED')
+        aircraft = create_aircraft(call_sign='AB1234', state='PARKED')
         payload = {
             'state': 'APPROACH',
             'public_key': 'valid public key'
@@ -196,7 +207,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'PARKED')
 
     def test_TAKE_OFF_aircraft_cant_swith_to_other_state_than_AIRBORNE(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='TAKE_OFF')
+        aircraft = create_aircraft(call_sign='AB1234', state='TAKE_OFF')
         payload = {
             'state': 'APPROACH',
             'public_key': 'valid public key'
@@ -210,7 +221,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'TAKE_OFF')
 
     def test_AIRBORNE_aircraft_cant_swith_to_other_state_than_APPROACH(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='AIRBORNE')
+        aircraft = create_aircraft(call_sign='AB1234', state='AIRBORNE')
         payload = {
             'state': 'TAKE_OFF',
             'public_key': 'valid public key'
@@ -224,7 +235,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'AIRBORNE')
 
     def test_APPROACH_aircraft_cant_swith_to_other_state_than_AIRBORNE_or_LANDED(self):
-        aircraft = Aircraft.objects.create(call_sign='AB1234', state='AIRBORNE')
+        aircraft = create_aircraft(call_sign='AB1234', state='AIRBORNE')
         payload = {
             'state': 'TAKE_OFF',
             'public_key': 'valid public key'
@@ -243,8 +254,8 @@ class AircraftPrivateApiTests(TestCase):
 
     @override_settings(AIRPORT_RUNAWAYS=1)
     def test_only_one_aircraft_can_be_on_the_runway(self):
-        Aircraft.objects.create(call_sign='A1', state='TAKE_OFF')
-        aircraft = Aircraft.objects.create(call_sign='A2', state='PARKED')
+        create_aircraft(call_sign='A1', state='TAKE_OFF')
+        aircraft = create_aircraft(call_sign='A2', state='PARKED')
 
         payload = {
             'state': 'TAKE_OFF',
@@ -260,8 +271,8 @@ class AircraftPrivateApiTests(TestCase):
 
     @override_settings(AIRPORT_RUNAWAYS=1)
     def test_APPROACH_cant_go_to_LAND_if_aircraft_on_runway(self):
-        Aircraft.objects.create(call_sign='A1', state='TAKE_OFF')
-        aircraft = Aircraft.objects.create(call_sign='A2', state='APPROACH')
+        create_aircraft(call_sign='A1', state='TAKE_OFF')
+        aircraft = create_aircraft(call_sign='A2', state='APPROACH')
 
         payload = {
             'state': 'LANDED',
@@ -277,8 +288,8 @@ class AircraftPrivateApiTests(TestCase):
 
     @override_settings(AIRPORT_RUNAWAYS=1)
     def test_APPROACH_cant_go_to_LAND_if_other_aircraft_LANDED(self):
-        Aircraft.objects.create(call_sign='A1', state='LANDED')
-        aircraft = Aircraft.objects.create(call_sign='A2', state='APPROACH')
+        create_aircraft(call_sign='A1', state='LANDED')
+        aircraft = create_aircraft(call_sign='A2', state='APPROACH')
 
         payload = {
             'state': 'LANDED',
@@ -293,8 +304,8 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(aircraft.state, 'APPROACH')
 
     def test_only_one_aircraft_can_be_on_APPROACH(self):
-        Aircraft.objects.create(call_sign='A1', state='APPROACH')
-        aircraft = Aircraft.objects.create(call_sign='A2', state='AIRBORNE')
+        create_aircraft(call_sign='A1', state='APPROACH')
+        aircraft = create_aircraft(call_sign='A2', state='AIRBORNE')
 
         payload = {
             'state': 'APPROACH',
@@ -310,4 +321,6 @@ class AircraftPrivateApiTests(TestCase):
 
 
 class AircraftLocationTests(TestCase):
-    pass
+
+    def setUp(self):
+        pass

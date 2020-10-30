@@ -19,7 +19,11 @@ class AircraftViewSet(viewsets.GenericViewSet):
     def intent(self, request, call_sign=None, pk=None):
         data = {
             'call_sign': call_sign,
-            'state': request.data.get('state', None)
+            'state': request.data.get('state', None),
+            'longitude': request.data.get('longitude', 0),
+            'latitude': request.data.get('latitude', 0),
+            'altitude': request.data.get('altitude', 0),
+            'heading': request.data.get('heading', 0),
         }
 
         serializer = self.get_serializer(data=data)
