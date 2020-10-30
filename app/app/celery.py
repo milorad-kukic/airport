@@ -16,14 +16,9 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'every-minute': {
         'task': 'airport.tasks.ground_crew_routine',
-        'schedule': 5
+        'schedule': 60   
     }
 }
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
-
-
-@app.task(bind=True)
-def debug_task(self):
-    print(f'Request: {self.request!r}')
