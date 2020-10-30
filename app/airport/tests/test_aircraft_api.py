@@ -12,25 +12,19 @@ class AircraftPrivateApiInvalidKeyTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        self.patcher = patch('airport.permissions.IsValidPublicKey.has_permission')
+        self.public_key_is_valid = self.patcher.start()
+        self.public_key_is_valid.return_value = False
 
-    def test_public_key_not_sent_should_return_401_unauthorized(self):
-        SENT_CALL_SIGN = 'AB1234'
-        payload = {
-            'state': 'APPROACH'
-        }
+    def tearDown(self):
+        self.patcher.stop()
 
-        res = self.client.post(f'/api/{SENT_CALL_SIGN}/intent/', payload)
-
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    @patch('airport.views.public_key_is_valid')
-    def test_invalid_public_key_should_return_401_unauthorized(self, public_key_is_valid):
+    def test_invalid_public_key_should_return_401_unauthorized(self):
         SENT_CALL_SIGN = 'AB1234'
         payload = {
             'state': 'TAKE_OFF',
             'public_key': 'invalid public key'
         }
-        public_key_is_valid.return_value = False
 
         self.client.post(f'/api/{SENT_CALL_SIGN}/intent/', payload)
 
@@ -42,7 +36,7 @@ class AircraftPrivateApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.patcher = patch('airport.views.public_key_is_valid')
+        self.patcher = patch('airport.permissions.IsValidPublicKey.has_permission')
         self.public_key_is_valid = self.patcher.start()
         self.public_key_is_valid.return_value = True
 
@@ -313,3 +307,7 @@ class AircraftPrivateApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(aircraft.state, 'AIRBORNE')
+
+
+class AircraftLocationTests(TestCase):
+    pass
