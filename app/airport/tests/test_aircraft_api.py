@@ -61,6 +61,7 @@ class AircraftPrivateApiTests(TestCase):
         SENT_CALL_SIGN = 'NC9574'
         payload = {
             'state': 'TAKE_OFF',
+            'type': 'AIRLINER',
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
@@ -68,15 +69,17 @@ class AircraftPrivateApiTests(TestCase):
 
         saved_aircraft = Aircraft.objects.get(call_sign=SENT_CALL_SIGN)
         self.assertEqual(saved_aircraft.call_sign, SENT_CALL_SIGN)
+        self.assertEqual(saved_aircraft.type, 'AIRLINER')
 
     def test_valid_take_off_request_should_return_204_no_content(self):
-        SENT_CALL_SIGN = 'AB1234'
+        CALL_SIGN = 'AB1234'
+        create_aircraft(call_sign=CALL_SIGN, type='AIRLINER', state='PARKED')
         payload = {
             'state': 'TAKE_OFF',
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{SENT_CALL_SIGN}/intent/', payload)
+        res = self.client.post(f'/api/{CALL_SIGN}/intent/', payload)
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertIsNone(res.data)
@@ -326,6 +329,68 @@ class AircraftPrivateApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(aircraft.state, 'AIRBORNE')
 
+    @override_settings(AIRPORT_LARGE_PARKING_SPOTS=5)
+    def test_AIRLINER_cant_land_if_no_large_parking_spot_available(self):
+        create_aircraft(call_sign='cs1', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs2', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs3', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs4', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs5', state='PARKED', type='AIRLINER')
+
+        aircraft = create_aircraft('CALL_123', state='APPROACH', type='AIRLINER')
+
+        payload = {
+            'state': 'LANDED',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        aircraft.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertIsNone(res.data)
+        self.assertEqual(aircraft.state, 'APPROACH')
+
+    @override_settings(AIRPORT_SMALL_PARKING_SPOTS=3)
+    def test_PRIVATE_cant_land_if_no_small_parking_spot_available(self):
+        create_aircraft(call_sign='cs1', state='PARKED', type='PRIVATE')
+        create_aircraft(call_sign='cs2', state='PARKED', type='PRIVATE')
+        create_aircraft(call_sign='cs3', state='PARKED', type='PRIVATE')
+
+        aircraft = create_aircraft('CALL_123', state='APPROACH', type='PRIVATE')
+
+        payload = {
+            'state': 'LANDED',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{aircraft.call_sign}/intent/', payload)
+
+        aircraft.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertIsNone(res.data)
+        self.assertEqual(aircraft.state, 'APPROACH')
+
+    @override_settings(AIRPORT_LARGE_PARKING_SPOTS=3)
+    def test_new_aircraft_with_no_state_cant_land_if_no_parking_spot_available(self):
+        create_aircraft(call_sign='cs1', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs2', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs3', state='PARKED', type='AIRLINER')
+
+        NEW_CALL_SIGN = 'MK2408'
+
+        payload = {
+            'state': 'LANDED',
+            'type': 'AIRLINER',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{NEW_CALL_SIGN}/intent/', payload)
+
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertIsNone(res.data)
+        self.assertFalse(Aircraft.objects.filter(call_sign=NEW_CALL_SIGN).exists())
+
 
 class AircraftLocationTests(TestCase):
 
@@ -338,7 +403,7 @@ class AircraftLocationTests(TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    def test_should_save_new_aircraft_if_valid_request_is_sent(self):
+    def test_should_save_new_location_data_if_valid_request_is_sent(self):
         CALL_SIGN = 'NC9574'
         create_aircraft(call_sign=CALL_SIGN)
 

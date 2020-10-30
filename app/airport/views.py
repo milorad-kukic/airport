@@ -21,6 +21,7 @@ class AircraftViewSet(viewsets.GenericViewSet):
         data = {
             'call_sign': call_sign,
             'state': request.data.get('state', None),
+            'type': request.data.get('type', None),
             'longitude': request.data.get('longitude', 0),
             'latitude': request.data.get('latitude', 0),
             'altitude': request.data.get('altitude', 0),
