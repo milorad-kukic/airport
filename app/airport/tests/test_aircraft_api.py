@@ -181,7 +181,7 @@ class AircraftPrivateApiTests(TestCase):
     # TESTS FOR INVALID WORKFLOW SWITCHING #
     ########################################
 
-    def test_aircraft_cant_switch_state_from_PARKED_to_invalid_state(self):
+    def test_aircraft_cValidationErrorant_switch_state_from_PARKED_to_invalid_state(self):
         aircraft = create_aircraft(call_sign='AB1234', state='PARKED')
         payload = {
             'state': 'INVALID STATE',
@@ -206,7 +206,8 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(res.data, None)
         self.assertEqual(aircraft.state, 'PARKED')
 
     def test_TAKE_OFF_aircraft_cant_swith_to_other_state_than_AIRBORNE(self):
@@ -220,7 +221,8 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(res.data, None)
         self.assertEqual(aircraft.state, 'TAKE_OFF')
 
     def test_AIRBORNE_aircraft_cant_swith_to_other_state_than_APPROACH(self):
@@ -234,7 +236,8 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(res.data, None)
         self.assertEqual(aircraft.state, 'AIRBORNE')
 
     def test_APPROACH_aircraft_cant_swith_to_other_state_than_AIRBORNE_or_LANDED(self):
@@ -248,7 +251,8 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(res.data, None)
         self.assertEqual(aircraft.state, 'AIRBORNE')
 
     #################################
@@ -269,7 +273,7 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(aircraft.state, 'PARKED')
 
     @override_settings(AIRPORT_RUNAWAYS=1)
@@ -286,7 +290,7 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(aircraft.state, 'APPROACH')
 
     @override_settings(AIRPORT_RUNAWAYS=1)
@@ -303,7 +307,7 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(aircraft.state, 'APPROACH')
 
     def test_only_one_aircraft_can_be_on_APPROACH(self):
@@ -319,7 +323,7 @@ class AircraftPrivateApiTests(TestCase):
 
         aircraft.refresh_from_db()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(aircraft.state, 'AIRBORNE')
 
 

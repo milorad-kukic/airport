@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from airport.models import Aircraft
 from airport.serializers import AircraftSerializer, LocationSerializer
 from airport.permissions import IsValidPublicKey
+from airport.exceptions import StateConflict
 
 
 class AircraftViewSet(viewsets.GenericViewSet):
@@ -40,6 +41,14 @@ class AircraftViewSet(viewsets.GenericViewSet):
             return Response(None, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+    def handle_exception(self, exc):
+        if isinstance(exc, (StateConflict,)):
+            response = Response(None, status=exc.status_code)
+        else:
+            response = super().handle_exception(exc)
+
+        return response
 
     @action(methods=['post'], detail=False,
             url_path='(?P<call_sign>[^/.]+)/location',

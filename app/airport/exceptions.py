@@ -6,3 +6,7 @@ class InvalidPublicKey(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = ''
     default_code = ''
+
+
+class StateConflict(APIException):
+    status_code = status.HTTP_409_CONFLICT

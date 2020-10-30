@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from airport.models import Aircraft
+from airport.exceptions import StateConflict
 
 STATE_FLOW = {
     Aircraft.PARKED: [Aircraft.TAKE_OFF],
@@ -43,7 +44,7 @@ class AircraftSerializer(serializers.ModelSerializer):
             valid_next_states = STATE_FLOW.get(aircraft.state)
 
             if not self.data['state'] in valid_next_states:
-                raise ValidationError()
+                raise StateConflict()
         except Aircraft.DoesNotExist:
             pass
 
@@ -58,13 +59,13 @@ class AircraftSerializer(serializers.ModelSerializer):
                 RUNWAY_CONT = settings.AIRPORT_RUNAWAYS
 
             if on_runway > RUNWAY_CONT - 1:
-                raise ValidationError()
+                raise StateConflict()
 
     def validate_no_other_approaching(self):
         if self.data['state'] == Aircraft.APPROACH:
             try:
                 Aircraft.objects.get(state=Aircraft.APPROACH)
-                raise ValidationError()
+                raise StateConflict()
             except Aircraft.DoesNotExist:
                 pass
 
