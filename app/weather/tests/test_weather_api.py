@@ -27,6 +27,13 @@ class WeatherApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def test_should_return_error_for_unknown_aircraft(self):
+        UNKNOWN_CALL = 'UC666'
+
+        res = self.client.get(f'/api/{UNKNOWN_CALL}/weather/')
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_wind_data_is_packed_togather(self):
         date_update = timezone.now()
         data = WeatherData.objects.create(

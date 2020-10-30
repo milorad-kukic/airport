@@ -7,5 +7,5 @@ class WeatherData(models.Model):
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     visibility = models.IntegerField()
     wind_speed = models.DecimalField(max_digits=5, decimal_places=2)
-    wind_deg = models.IntegerField() 
+    wind_deg = models.IntegerField()
     last_update = models.DateTimeField(default=timezone.now)

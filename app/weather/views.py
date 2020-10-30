@@ -4,6 +4,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from airport.models import Aircraft
+
 from weather.models import WeatherData
 from weather.serializers import WeatherDataSerializer
 
@@ -17,6 +19,11 @@ class WeatherViewSet(viewsets.GenericViewSet):
             url_path='(?P<call_sign>[^/.]+)/weather',
             url_name='weather')
     def weather(self, request, call_sign=None, *args):
+        try:
+            Aircraft.objects.get(call_sign=call_sign)
+        except Aircraft.DoesNotExist:
+            return Response(None, status.HTTP_401_UNAUTHORIZED)
+
         weather_data = WeatherData.objects.first()
 
         if not weather_data:
@@ -27,5 +34,4 @@ class WeatherViewSet(viewsets.GenericViewSet):
         if serializer.is_valid():
             return Response(serializer.data)
         else:
-            print(serializer.errors)
             return Response({'error': 'invalid'})

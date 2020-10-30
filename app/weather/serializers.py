@@ -18,6 +18,11 @@ class WeatherDataSerializer(serializers.ModelSerializer):
             'deg': obj.get('wind_deg', None)
         }
 
+    def is_valid(self, raise_exception=False):
+        valid = super().is_valid(raise_exception)
+
+        return valid
+
     def to_representation(self, obj):
         ret = super(WeatherDataSerializer, self).to_representation(obj)
         ret.pop('wind_speed')

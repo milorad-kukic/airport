@@ -16,7 +16,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'every-minute': {
         'task': 'airport.tasks.ground_crew_routine',
-        'schedule': 60   
+        'schedule': 60
     }
 }
 
