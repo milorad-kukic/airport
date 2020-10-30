@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from airport.models import Aircraft
-from airport.serializers import AircraftSerializer
+from airport.serializers import AircraftSerializer, LocationSerializer
 from airport.permissions import IsValidPublicKey
 
 
@@ -35,6 +35,32 @@ class AircraftViewSet(viewsets.GenericViewSet):
                 aircraft = Aircraft.objects.create(**serializer.data)
 
             aircraft.state = serializer.data['state']
+            aircraft.save()
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False,
+            url_path='(?P<call_sign>[^/.]+)/location',
+            url_name='location')
+    def location(self, request, call_sign=None, pk=None):
+
+        aircraft = Aircraft.objects.get(call_sign=call_sign)
+
+        data = {
+            'call_sign': call_sign,
+            'type': request.data.get('type', None),
+            'longitude': request.data.get('longitude', None),
+            'latitude': request.data.get('latitude', None),
+            'altitude': request.data.get('altitude', None),
+            'heading': request.data.get('heading', None)
+        }
+        serializer = LocationSerializer(data=data)
+
+        if serializer.is_valid():
+            for k, v in data.items():
+                setattr(aircraft, k, v)
             aircraft.save()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)

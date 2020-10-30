@@ -67,3 +67,25 @@ class AircraftSerializer(serializers.ModelSerializer):
                 raise ValidationError()
             except Aircraft.DoesNotExist:
                 pass
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Aircraft
+        fields = ('call_sign', 'type', 'longitude', 'latitude',
+                  'altitude', 'heading')
+        extra_kwargs = {
+            'call_sign': {
+                'validators': []
+            }
+        }
+
+    def is_valid(self, raise_exception=False):
+        valid = super().is_valid(raise_exception)
+
+        if valid:
+            from_db = Aircraft.objects.get(call_sign=self.data['call_sign'])
+            if self.data['type'] != from_db.type:
+                raise ValidationError()
+
+        return valid

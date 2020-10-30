@@ -6,12 +6,15 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from airport.models import Aircraft
+from airport.exceptions import InvalidPublicKey
 
 
-def create_aircraft(call_sign, state='PARKED', longitude=0, latitude=0, altitude=0, heading=0):
+def create_aircraft(call_sign, state='PARKED', type='AIRLINER', longitude=0,
+                    latitude=0, altitude=0, heading=0):
     return Aircraft.objects.create(
         call_sign=call_sign,
         state=state,
+        type=type,
         longitude=longitude,
         latitude=latitude,
         altitude=altitude,
@@ -323,4 +326,207 @@ class AircraftPrivateApiTests(TestCase):
 class AircraftLocationTests(TestCase):
 
     def setUp(self):
-        pass
+        self.client = APIClient()
+        self.patcher = patch('airport.permissions.IsValidPublicKey.has_permission')
+        self.public_key_is_valid = self.patcher.start()
+        self.public_key_is_valid.return_value = True
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_should_save_new_aircraft_if_valid_request_is_sent(self):
+        CALL_SIGN = 'NC9574'
+        create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': 'AIRLINER',
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 3500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(saved_aircraft.altitude, 3500)
+
+    def test_type_can_be_PRIVATE(self):
+        CALL_SIGN = 'NC9574'
+        create_aircraft(call_sign=CALL_SIGN, type='PRIVATE')
+
+        payload = {
+            'type': 'PRIVATE',
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 4500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(saved_aircraft.altitude, 4500)
+
+    def test_should_return_error_if_type_is_not_PRIVATE_or_AIRLINER(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': 'UNKNOWN_TYPE',
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 4500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+    def test_should_return_error_if_try_to_set_different_type(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN, type='AIRLINER')
+
+        payload = {
+            'type': 'PRIVATE',
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 4500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+    def test_type_param_is_mandatory(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 3500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+    def test_longitude_param_is_mandatory(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': "AIRLINER",
+            'latitude': "44.82128505247063",
+            'altitude': 3500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+    def test_latitude_param_is_mandatory(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': "AIRLINER",
+            'longitude': "20",
+            'altitude': 3500,
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+    def test_altitude_param_is_mandatory(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': "AIRLINER",
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'heading': 220,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+    def test_heading_is_mandatory(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': 'AIRLINER',
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 3500,
+            'public_key': 'dummy_public_key_that_we_consider_valid'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(saved_aircraft, aircraft)
+
+
+class LocationApiInvalidKeyTests(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.patcher = patch('airport.permissions.IsValidPublicKey.has_permission')
+        self.public_key_is_valid = self.patcher.start()
+        self.public_key_is_valid.side_effect = InvalidPublicKey
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_invalid_public_key_should_return_401_unauthorized(self):
+        CALL_SIGN = 'NC9574'
+        aircraft = create_aircraft(call_sign=CALL_SIGN)
+
+        payload = {
+            'type': 'AIRLINER',
+            'longitude': "20.455516172478386",
+            'latitude': "44.82128505247063",
+            'altitude': 3500,
+            'heading': 220,
+            'public_key': 'INVALID KEY'
+        }
+
+        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+
+        saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(saved_aircraft, aircraft)
