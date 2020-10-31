@@ -81,11 +81,7 @@
         <tr>
           <th>Call</th> <th>State</th> <th>Intent</th> <th>Done</th> <th>Description</th>
         </tr>
-        <tr>
-          <td>JE2508</td> <td>PARKED</td> <td>TAKE_OFF</td> <td>ACCEPTED</td> <td>Description</td>
-        </tr>
-      </table>
-
+      </table> 
     </div>
   </div>
 
@@ -127,6 +123,7 @@ $(document).ready(function() {
       });
   }
 
+  fetchStateChangeLogs();
   setInterval(fetchStateChangeLogs, 10000);
 
 
