@@ -23,7 +23,11 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        {% translate 'Home' %}
+    </div>
+{% endblock %}
 
 {% block nav-sidebar %}{% endblock %}
 

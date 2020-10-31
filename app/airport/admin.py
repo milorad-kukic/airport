@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import sites
 from django.views.decorators.cache import never_cache
 
-from airport.models import Aircraft
+from airport.models import Aircraft, StateChangeLog
 
 from weather.models import WeatherData
 
@@ -38,9 +38,33 @@ class AirportAdminSite(sites.AdminSite):
         return super(AirportAdminSite, self).index(request, extra_context)
 
 
+class ReadOnlyModelAdmin(admin.ModelAdmin):
+    actions = None
+
+    def has_add_permission(self, request):
+        return False
+
+    # Allow viewing objects but not actually changing them.
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class StateChangeLogAdmin(ReadOnlyModelAdmin):
+    list_display = ('aircraft', 'from_state', 'to_state', 'outcome', 'description', 'time')
+
+class AircraftAdmin(ReadOnlyModelAdmin):
+    list_display = ('call_sign', 'type', 'state', 'longitude', 'latitude', 'altitude', 'heading')
+
+
 admin_site = AirportAdminSite()
 admin_site.site_header = "Airport Administration"
 admin_site.index_title = "Dashboard"
+
+admin_site.register(Aircraft, AircraftAdmin)
+admin_site.register(StateChangeLog, StateChangeLogAdmin)
 
 admin.site = admin_site
 sites.site = admin_site

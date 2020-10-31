@@ -4,7 +4,6 @@
 
 .box-content {
   padding: 10px;
-  width: 1000 px;
 }
 
 .weather-image {
@@ -20,5 +19,13 @@
 
 #logs_table td:last-child{
   width: 100%;
+}
+
+
+.see-all {
+  text-align: right;
+  padding: 1em 1.5em;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
