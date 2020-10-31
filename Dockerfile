@@ -8,9 +8,10 @@ ENV PYTHONUNBUFFERED 1
 COPY ./requirements.txt /requirements.txt
 COPY ./keys /keys
 
+RUN apk add --update --no-cache postgresql-client
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
-        gcc g++ make libffi-dev openssl-dev
-       # gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
+        gcc g++ make libffi-dev openssl-dev \
+        libc-dev linux-headers postgresql-dev 
 
 RUN pip install -r /requirements.txt
 

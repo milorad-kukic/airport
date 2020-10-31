@@ -12,10 +12,22 @@ services:
       sh -c "python manage.py runserver 0.0.0.0:8000"
     image: airport_python
     environment:
+      - DB_HOST=db
+      - DB_NAME=airport
+      - DB_USER=postgres
+      - DB_PASSWORD=secretpassword
       - CELERY_BROKER=redis://redis:6379
       - CELERY_BACKEND=redis://redis:6379
     depends_on:
+      - db
       - redis
+
+  db: 
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_DB=airport
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secretpassword
 
   celery:
     build: .
