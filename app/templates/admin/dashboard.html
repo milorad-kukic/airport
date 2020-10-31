@@ -1,11 +1,14 @@
 {% load i18n static %}
 {% load airport_tags %}
 
+<script src="{% static "js/jquery-3.5.1.min.js" %}"></script>
+
 <link rel="stylesheet" type="text/css" href="{% static 'css/chart.css'%}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/custom_dashboard.css'%}">
 
 {% block content %}
 <div id="content-main">
+
   <div class="module box effect1">
     <h2>PARKING OVERVIEW</h2>
     <div class='box-content'>
@@ -66,5 +69,62 @@
 
     </div>
   </div>
+
 </div>
+
+
+
+  <div id="content-related" class="effect1">
+    <h2>RECENT ACTIONS</h2>
+    <div class='box-content'>
+      <table id="logs_table">
+        <tr>
+          <th>Call</th> <th>State</th> <th>Intent</th> <th>Outcome</th> <th>Description</th>
+        </tr>
+        <tr>
+          <td>JE2508</td> <td>PARKED</td> <td>TAKE_OFF</td> <td>ACCEPTED</td> <td>Description</td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+
+
+
+<script>
+$(document).ready(function() {
+
+  function fetchStateChangeLogs() {
+      $.get("/api/state_logs/?limit=10", function(data, status){
+        if (data['results']) {
+            $('#logs_table tr td').parents('tr').remove();
+          for (i = 0; i < data['results'].length; i++) {
+            console.log(data['results'][i]);
+            call_sign = data['results'][i]['call_sign'];
+            state = data['results'][i]['from_state'];
+            intent = data['results'][i]['to_state'];
+            outcome = data['results'][i]['outcome'];
+            description = data['results'][i]['description'];
+
+            $('#logs_table tr:last').after(
+                '<tr>' +
+                    '<td>' + call_sign + '</td>' +
+                    '<td>' + state + '</td>' +
+                    '<td>' + intent + '</td>' +
+                    '<td>' + outcome + '</td>' +
+                    '<td>' + description + '</td>' +
+                '</tr>');
+          }
+        }
+      });
+  }
+
+  setInterval(fetchStateChangeLogs, 10000);
+
+
+});
+</script>
+
 {% endblock %}
+
+
