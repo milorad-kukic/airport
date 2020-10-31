@@ -1,0 +1,70 @@
+{% load i18n static %}
+{% load airport_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/chart.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom_dashboard.css'%}">
+
+{% block content %}
+<div id="content-main">
+  <div class="module box effect1">
+    <h2>PARKING OVERVIEW</h2>
+    <div class='box-content'>
+
+    <p>
+    Small parking - available <b>{{ SMALL_PARKING_SPOTS | subtract:parked_small_count}}</b> of <b>{{ SMALL_PARKING_SPOTS }}</b> <br>
+    Large parking - available <b>{{ LARGE_PARKING_SPOTS | subtract:parked_large_count}}</b> of <b>{{ LARGE_PARKING_SPOTS }}</b>
+    </p>
+
+    <!-- GRAPH -->
+    <hr>
+    <h3>Occupancy Graph</h3>
+    <br>
+    <div class="charts">
+      <span>Small parking</span>
+      <div class="charts__chart chart--p{{taken_small_percent}} chart--green" data-percent></div><!-- /.charts__chart -->
+      <span>Large parking</span>
+      <div class="charts__chart chart--p{{taken_large_percent}} chart--red" data-percent></div><!-- /.charts__chart -->
+    </div><!-- /.charts -->
+
+    </div>
+  </div>
+
+
+  <div class="module box effect1">
+    <h2>WEATHER DATA</h2>
+    <div class='box-content'>
+      <table style="float: left;">
+        <tr>
+          <td>Description:<td>
+          <td><b>{{weather_data.description}}</b><td>
+        </tr>
+        <tr>
+          <td>Temperature:<td>
+          <td><b>{{weather_data.temperature}} &#8451;</b><td>
+        </tr>
+        <tr>
+          <td>Visibility:<td>
+          <td><b>{{weather_data.visibility}}</b><td>
+        </tr>
+        <tr>
+          <td>Wind Speed:<td>
+          <td><b>{{weather_data.wind_speed}}</b><td>
+        </tr>
+        <tr>
+          <td>Wind Deg:<td>
+          <td><b>{{weather_data.wind_deg}}</b><td>
+        </tr>
+        <tr>
+          <td>Last Update:<td>
+          <td><b>{{weather_data.last_update|date:"SHORT_DATETIME_FORMAT"}}</b><td>
+        </tr>
+      </table>
+
+      <img src="{% static 'img/weather.jpg'%}" height="150" class="weather-image"/>
+
+      <p style="clear: both"</p>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
