@@ -55,6 +55,7 @@ class ReadOnlyModelAdmin(admin.ModelAdmin):
 class StateChangeLogAdmin(ReadOnlyModelAdmin):
     list_display = ('aircraft', 'from_state', 'to_state', 'outcome', 'description', 'time')
 
+
 class AircraftAdmin(ReadOnlyModelAdmin):
     list_display = ('call_sign', 'type', 'state', 'longitude', 'latitude', 'altitude', 'heading')
 
