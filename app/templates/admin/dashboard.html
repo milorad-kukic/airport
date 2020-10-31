@@ -79,7 +79,7 @@
     <div class='box-content'>
       <table id="logs_table">
         <tr>
-          <th>Call</th> <th>State</th> <th>Intent</th> <th>Outcome</th> <th>Description</th>
+          <th>Call</th> <th>State</th> <th>Intent</th> <th>Done</th> <th>Description</th>
         </tr>
         <tr>
           <td>JE2508</td> <td>PARKED</td> <td>TAKE_OFF</td> <td>ACCEPTED</td> <td>Description</td>
@@ -93,6 +93,14 @@
 
 <script>
 $(document).ready(function() {
+
+  function getImage(outcome) {
+      if (outcome === 'REJECTED') {
+        return '<img src="{% static 'img/rejected.png'%}" />';
+      } else {
+        return '<img src="{% static 'img/accepted.png'%}" />';
+      }
+  }
 
   function fetchStateChangeLogs() {
       $.get("/api/state_logs/?limit=10", function(data, status){
@@ -111,7 +119,7 @@ $(document).ready(function() {
                     '<td>' + call_sign + '</td>' +
                     '<td>' + state + '</td>' +
                     '<td>' + intent + '</td>' +
-                    '<td>' + outcome + '</td>' +
+                    '<td>' + getImage(outcome) + '</td>' +
                     '<td>' + description + '</td>' +
                 '</tr>');
           }
