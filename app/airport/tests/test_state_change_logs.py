@@ -205,6 +205,28 @@ class StateChangeLogTests(TestCase):
     # CUSTOM ASSERTIONS #
     #####################
 
+    def test_new_aircraft_added_success_log(self):
+        CALL_SIGN = 'MK2408'
+        payload = {
+            'type': 'AIRLINER',
+            'state': 'PARKED',
+            'intent': 'TAKE_OFF',
+            'public_key': 'valid public key'
+        }
+
+        self.client.post(f'/api/{CALL_SIGN}/intent/', payload)
+
+        aircraft = Aircraft.objects.first()  # aircraft should be created
+
+        logs = StateChangeLog.objects.all()
+        self.assertEqual(len(logs), 1)
+        log = logs[0]
+        self.assertLog(log, aircraft, 'PARKED', 'TAKE_OFF', 'ACCEPTED')
+
+    #####################
+    # CUSTOM ASSERTIONS #
+    #####################
+
     def assertLog(self, log, expected_aircraft, expected_from_state, expected_to_state, expected_outcome):
         self.assertEqual(log.aircraft, expected_aircraft)
         self.assertEqual(log.from_state, expected_from_state)

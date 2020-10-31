@@ -60,8 +60,9 @@ class AircraftPrivateApiTests(TestCase):
     def test_should_save_new_aircraft_if_valid_request_is_sent(self):
         SENT_CALL_SIGN = 'NC9574'
         payload = {
-            'state': 'TAKE_OFF',
             'type': 'AIRLINER',
+            'state': 'TAKE_OFF',
+            'intent': 'AIRBORNE',
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 

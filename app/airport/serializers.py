@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from airport.models import Aircraft
+from airport.models import Aircraft, StateChangeLog
 from airport.exceptions import StateConflict
 
 STATE_FLOW = {
@@ -158,3 +158,18 @@ class LocationSerializer(serializers.ModelSerializer):
                 raise ValidationError()
 
         return valid
+
+
+class StateChangeLogSerializer(serializers.ModelSerializer):
+    aircraft = serializers.SlugRelatedField(many=False, read_only=True, slug_field='call_sign')
+
+    class Meta:
+        model = StateChangeLog
+        fields = ('aircraft', 'from_state', 'to_state', 'outcome', 'description', 'time')
+
+    def to_representation(self, obj):
+        ret = super(StateChangeLogSerializer, self).to_representation(obj)
+        call_sign = ret.pop('aircraft')
+        ret['call_sign'] = call_sign
+
+        return ret

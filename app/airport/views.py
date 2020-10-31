@@ -1,9 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 
 from airport.models import Aircraft, StateChangeLog
-from airport.serializers import AircraftSerializer, LocationSerializer
+from airport.serializers import AircraftSerializer, LocationSerializer, StateChangeLogSerializer
 from airport.permissions import IsValidPublicKey
 from airport.exceptions import StateConflict
 
@@ -30,15 +31,23 @@ class AircraftViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(data=data)
 
         if serializer.is_valid():
+            state_from = ''
+            state_to = ''
             try:
                 aircraft = Aircraft.objects.get(call_sign=call_sign)
+                state_from = aircraft.state
+                state_to = data['state']
             except Aircraft.DoesNotExist:
-                aircraft = Aircraft.objects.create(**serializer.data)
+                aircraft = Aircraft(**serializer.data)
+                state_from = request.data.get('state', None)
+                state_to = request.data.get('intent', None)
+                aircraft.state = state_to
+                aircraft.save()
 
             log = StateChangeLog(
                 aircraft=aircraft,
-                from_state=aircraft.state,
-                to_state=serializer.data['state'],
+                from_state=state_from,
+                to_state=state_to,
                 outcome='ACCEPTED'
             )
 
@@ -92,3 +101,9 @@ class AircraftViewSet(viewsets.GenericViewSet):
             return Response(None, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StateChangeLogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = StateChangeLogSerializer
+    queryset = StateChangeLog.objects.all().order_by('-time')
+    pagination_class = LimitOffsetPagination
