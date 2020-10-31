@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Aircraft(models.Model):
@@ -42,3 +43,16 @@ class Aircraft(models.Model):
 
     def __str__(self):
         return self.call_sign
+
+
+class StateChangeLog(models.Model):
+    OUTCOMES = [
+        ('ACCEPTED', 'ACCEPTED'),
+        ('REJECTED', 'REJECTED')
+    ]
+    aircraft = models.ForeignKey(Aircraft, on_delete=models.CASCADE)
+    from_state = models.CharField(max_length=50, choices=Aircraft.STATUSES)
+    to_state = models.CharField(max_length=50, choices=Aircraft.STATUSES)
+    outcome = models.CharField(max_length=10, choices=OUTCOMES)
+    description = models.CharField(max_length=255)
+    time = models.DateTimeField(default=timezone.now)

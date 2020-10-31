@@ -63,7 +63,11 @@ class AircraftSerializer(serializers.ModelSerializer):
             valid_next_states = STATE_FLOW.get(aircraft.state)
 
             if not self.data['state'] in valid_next_states:
-                raise StateConflict()
+                raise StateConflict(
+                    aircraft=aircraft,
+                    from_state=aircraft.state,
+                    to_state=self.data['state']
+                )
 
     def validate_empty_runway(self):
         if self.data['state'] in [Aircraft.TAKE_OFF, Aircraft.LANDED]:
@@ -76,13 +80,27 @@ class AircraftSerializer(serializers.ModelSerializer):
                 RUNWAY_CONT = settings.AIRPORT_RUNAWAYS
 
             if on_runway > RUNWAY_CONT - 1:
-                raise StateConflict()
+                from_state = ''
+                if self.db_object:
+                    from_state = self.db_object.state
+                raise StateConflict(
+                    aircraft=self.db_object,
+                    from_state=from_state,
+                    to_state=self.data['state']
+                )
 
     def validate_no_other_approaching(self):
         if self.data['state'] == Aircraft.APPROACH:
             try:
                 Aircraft.objects.get(state=Aircraft.APPROACH)
-                raise StateConflict()
+                from_state = ''
+                if self.db_object:
+                    from_state = self.db_object.state
+                raise StateConflict(
+                    aircraft=self.db_object,
+                    from_state=from_state,
+                    to_state=self.data['state']
+                )
             except Aircraft.DoesNotExist:
                 pass
 
@@ -106,7 +124,14 @@ class AircraftSerializer(serializers.ModelSerializer):
                 PARKING_PLACES = settings.AIRPORT_SMALL_PARKING_SPOTS
 
         if parking_taken_count >= PARKING_PLACES:
-            raise StateConflict()
+            from_state = ''
+            if self.db_object:
+                from_state = self.db_object.state
+            raise StateConflict(
+                aircraft=self.db_object,
+                from_state=from_state,
+                to_state=self.data['state']
+            )
 
 
 class LocationSerializer(serializers.ModelSerializer):

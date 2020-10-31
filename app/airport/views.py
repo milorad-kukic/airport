@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from airport.models import Aircraft
+from airport.models import Aircraft, StateChangeLog
 from airport.serializers import AircraftSerializer, LocationSerializer
 from airport.permissions import IsValidPublicKey
 from airport.exceptions import StateConflict
@@ -35,8 +35,17 @@ class AircraftViewSet(viewsets.GenericViewSet):
             except Aircraft.DoesNotExist:
                 aircraft = Aircraft.objects.create(**serializer.data)
 
+            log = StateChangeLog(
+                aircraft=aircraft,
+                from_state=aircraft.state,
+                to_state=serializer.data['state'],
+                outcome='ACCEPTED'
+            )
+
             aircraft.state = serializer.data['state']
             aircraft.save()
+
+            log.save()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
         else:
@@ -44,6 +53,13 @@ class AircraftViewSet(viewsets.GenericViewSet):
 
     def handle_exception(self, exc):
         if isinstance(exc, (StateConflict,)):
+            if exc.aircraft:
+                StateChangeLog.objects.create(
+                    aircraft=exc.aircraft,
+                    from_state=exc.from_state,
+                    to_state=exc.to_state,
+                    outcome='REJECTED'
+                )
             response = Response(None, status=exc.status_code)
         else:
             response = super().handle_exception(exc)
