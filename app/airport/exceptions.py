@@ -11,7 +11,8 @@ class InvalidPublicKey(APIException):
 class StateConflict(APIException):
     status_code = status.HTTP_409_CONFLICT
 
-    def __init__(self, aircraft, from_state, to_state):
+    def __init__(self, aircraft, from_state, to_state, description=""):
         self.aircraft = aircraft
         self.from_state = from_state
         self.to_state = to_state
+        self.description = description

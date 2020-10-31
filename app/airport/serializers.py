@@ -66,7 +66,8 @@ class AircraftSerializer(serializers.ModelSerializer):
                 raise StateConflict(
                     aircraft=aircraft,
                     from_state=aircraft.state,
-                    to_state=self.data['state']
+                    to_state=self.data['state'],
+                    description='Not a valid state change'
                 )
 
     def validate_empty_runway(self):
@@ -86,7 +87,8 @@ class AircraftSerializer(serializers.ModelSerializer):
                 raise StateConflict(
                     aircraft=self.db_object,
                     from_state=from_state,
-                    to_state=self.data['state']
+                    to_state=self.data['state'],
+                    description='The runway is occupied'
                 )
 
     def validate_no_other_approaching(self):
@@ -99,7 +101,8 @@ class AircraftSerializer(serializers.ModelSerializer):
                 raise StateConflict(
                     aircraft=self.db_object,
                     from_state=from_state,
-                    to_state=self.data['state']
+                    to_state=self.data['state'],
+                    description="Other aircraft is on approach"
                 )
             except Aircraft.DoesNotExist:
                 pass
@@ -130,7 +133,8 @@ class AircraftSerializer(serializers.ModelSerializer):
             raise StateConflict(
                 aircraft=self.db_object,
                 from_state=from_state,
-                to_state=self.data['state']
+                to_state=self.data['state'],
+                description='No free parking spot'
             )
 
 

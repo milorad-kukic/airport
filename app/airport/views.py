@@ -58,6 +58,7 @@ class AircraftViewSet(viewsets.GenericViewSet):
                     aircraft=exc.aircraft,
                     from_state=exc.from_state,
                     to_state=exc.to_state,
+                    description=exc.description,
                     outcome='REJECTED'
                 )
             response = Response(None, status=exc.status_code)
