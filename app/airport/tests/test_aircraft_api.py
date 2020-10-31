@@ -71,6 +71,7 @@ class AircraftPrivateApiTests(TestCase):
         saved_aircraft = Aircraft.objects.get(call_sign=SENT_CALL_SIGN)
         self.assertEqual(saved_aircraft.call_sign, SENT_CALL_SIGN)
         self.assertEqual(saved_aircraft.type, 'AIRLINER')
+        self.assertEqual(saved_aircraft.state, 'AIRBORNE')
 
     def test_valid_take_off_request_should_return_204_no_content(self):
         CALL_SIGN = 'AB1234'

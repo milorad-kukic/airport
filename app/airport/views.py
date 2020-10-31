@@ -18,9 +18,15 @@ class AircraftViewSet(viewsets.GenericViewSet):
             url_path='(?P<call_sign>[^/.]+)/intent',
             url_name='intent')
     def intent(self, request, call_sign=None, pk=None):
+
+        intent = request.data.get('intent', None)
+        state = request.data.get('state', None)
+        if intent:
+            state = intent
+
         data = {
             'call_sign': call_sign,
-            'state': request.data.get('state', None),
+            'state': state,
             'type': request.data.get('type', None),
             'longitude': request.data.get('longitude', 0),
             'latitude': request.data.get('latitude', 0),
