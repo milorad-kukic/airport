@@ -1,10 +1,22 @@
 from celery import shared_task
 
-from airport.models import Aircraft
+from airport.models import Aircraft, StateChangeLog
 
 
 @shared_task
 def ground_crew_routine():
-    Aircraft.objects.filter(
+    aircraft = Aircraft.objects.filter(
             state=Aircraft.LANDED
-    ).update(state=Aircraft.PARKED)
+    ).first()
+
+    if aircraft:
+        aircraft.state = Aircraft.PARKED
+        aircraft.save()
+
+        StateChangeLog.objects.create(
+            aircraft=aircraft,
+            from_state=Aircraft.LANDED,
+            to_state=Aircraft.PARKED,
+            outcome='ACCEPTED',
+            description='Paked by ground crew'
+        )
