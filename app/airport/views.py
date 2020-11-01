@@ -113,3 +113,19 @@ class StateChangeLogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = StateChangeLogSerializer
     queryset = StateChangeLog.objects.all().order_by('-time')
     pagination_class = LimitOffsetPagination
+
+
+class StartSimulationViewSet(viewsets.GenericViewSet):
+    """ This view is used for demo purposes only to easily exercise an API.
+    It will remove all existing aircrafts and state change logs from the system.
+    """
+
+    queryset = Aircraft.objects.all()
+    permission_classes = [IsValidPublicKey]
+
+    @action(methods=['post'], detail=False,
+            url_path='start',
+            url_name='start_simulation')
+    def start_simulation(self, request, *args):
+        Aircraft.objects.all().delete()
+        return Response()

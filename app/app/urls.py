@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('airport.urls')),
     path('api/', include('weather.urls')),
+    path('simulator/', TemplateView.as_view(template_name='simulator.html')),
 ]

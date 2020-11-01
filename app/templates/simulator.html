@@ -1,0 +1,51 @@
+{% load i18n static %}
+<html>
+
+<body>
+  <h1>Flight Simulator</h1>
+
+  <div id="public_key_box" style="float: left;">
+    <h3>Public key</h3>
+    <textarea id="public_key" rows="6" cols="60"></textarea>
+    <br>
+    <button id="start_simulation">Start Simulation </button>
+
+  </div>
+
+  <div style="float:right; width: 60%;">
+    <button id="next_step_btn" disabled="true">Execute next step</button>
+    <table>
+        <tr><td>Next action</td><td><input type="text" id="next_description" disabled="true" style="width: 500px"></td></tr>
+        <tr><td>URL</td><td><input type="text" id="next_url" disabled="true" style="width: 500px"></td></tr>
+        <tr><td>Data</td><td><textarea type="text" id="next_data" disabled="true" style="width: 500px" rows="8"></textarea></td></tr>
+    </table>
+  </div>
+  <div style="clear: both;">
+  <br>
+
+  <hr>
+
+  <canvas id="canvas" width="600" height="400" 
+    style="border: 1px solid black; float: left;">
+  </canvas>
+
+  <div id="api_call_log" 
+    style="border: 1px solid black; float: right; padding-right: 300px; width:600px;%">
+    <table id="actions_table">
+      <tr><th>call</th><th>Action</th></tr>
+      <tr><td>RED</td><td>takeoff</td></tr>
+    </table>
+  </div>
+
+  <div style="clear:both">
+  </div>
+
+  <img id="runway_image" src="{% static '/img/runway.jpg' %}" >
+
+</body>
+
+<script src="{% static '/js/jquery-3.5.1.min.js' %}"></script>
+<script src="{% static '/js/simulator/actions.js' %}"></script>
+<script src="{% static '/js/simulator/simulator.js' %}"></script>
+
+</html>

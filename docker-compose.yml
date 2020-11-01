@@ -31,7 +31,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secretpassword
     volumes:
-      - postgres_data:/var/lib/postresql/data/
+      - ./pgdata:/var/lib/postresql/data/
 
   celery:
     build: .
@@ -56,6 +56,3 @@ services:
     
   redis:
     image: redis:6.0.9-alpine
-
-volumes:
-  postgres_data:
