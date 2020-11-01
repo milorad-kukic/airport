@@ -39,7 +39,35 @@ function sendIntent(action) {
         console.log('error')
       }
   });
+}
 
+function sendLocation(action) {
+  key = $("#public_key").val();
+
+  const csrftoken = getCookie('csrftoken');
+
+  $.ajax({
+      url: "/api/"+action.aircraft.call_sign+"/location/", 
+      type: "post",
+      data: {
+          public_key: key,
+          type: action.data.type,
+          longitude: action.data.longitude,
+          latitude: action.data.latitude,
+          altitude: action.data.altitude,
+          heading: action.data.heading
+      },
+      headers: {
+        'X-CSRFToken': csrftoken
+      },
+      dataType: 'json',
+      success: function(data){
+        console.log('success');
+      },
+      error: function(error) {
+        console.log('error')
+      }
+  });
 }
 
 function newAircraftIntent(callSign, type, state, intent) {
@@ -77,6 +105,8 @@ function executeStep(step) {
     if (action.aircraft.known) {
         if (action.method === 'intent') {
             sendIntent(action)
+        } else if (action.method === 'location') {
+            sendLocation(action);
         }
         action.after();
     } else {

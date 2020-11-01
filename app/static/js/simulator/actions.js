@@ -62,8 +62,8 @@ actions = [
         method: 'location',
         data: {
             type: "AIRLINER",
-            longitude: "",
-            latitude: "",
+            longitude: "20.455516172478386",
+            latitude: "44.82128505247063",
             altitude: 2800,
             heading: 220
         },
