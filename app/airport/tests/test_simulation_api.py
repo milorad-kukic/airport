@@ -60,24 +60,3 @@ class StartSimulationApiTests(TestCase):
 
         self.assertEqual(Aircraft.objects.all().count(), 0)
         self.assertEqual(StateChangeLog.objects.all().count(), 0)
-
-
-class StartSimulationUnauthorizedApiTests(TestCase):
-
-    def setUp(self):
-        self.client = APIClient()
-        self.patcher = patch('airport.permissions.IsValidPublicKey.has_permission')
-        self.public_key_is_valid = self.patcher.start()
-        self.public_key_is_valid.return_value = False
-
-    def tearDown(self):
-        self.patcher.stop()
-
-    def test_should_return_error_if_invalid_public_key(self):
-        payload = {
-            "public_key": "invalid key"
-        }
-
-        res = self.client.post("/api/simulation/start/", payload)
-
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)

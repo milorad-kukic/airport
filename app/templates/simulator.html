@@ -1,8 +1,36 @@
 {% load i18n static %}
-<html>
+<!DOCTYPE HTML>
 
-<body>
-  <h1>Flight Simulator</h1>
+<html>
+	<head>
+		<title>Next-Generation Airport</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="{% static "/css/site/simulator.css" %}">
+	</head>
+	<body class="landing">
+
+		<!-- Header -->
+			<header id="header" class="alt">
+				<h1><strong><a href="index.html">Airport Automation</a></strong> - future is here </h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/simulator">Simulator</a></li>
+					</ul>
+				</nav>
+			</header>
+
+			<a href="#menu" class="navPanelToggle"><span class="fa fa-bars"></span></a>
+
+		<!-- Banner -->
+			<section id="banner">
+				
+			</section>
+
+			<!-- One -->
+				<section id="simulator_section" class="wrapper style1">
+					<div class="container 100%">
 
   <div id="public_key_box" style="float: left;">
     <h3>Public key</h3>
@@ -12,7 +40,7 @@
 
   </div>
 
-  <div style="float:right; width: 60%;">
+  <div style="float:right; width: 50%;">
     <button id="next_step_btn" disabled="true">Execute next step</button>
     <table>
         <tr><td>Next action</td><td><input type="text" id="next_description" disabled="true" style="width: 500px"></td></tr>
@@ -23,29 +51,38 @@
   <div style="clear: both;">
   <br>
 
-  <hr>
-
   <canvas id="canvas" width="600" height="400" 
     style="border: 1px solid black; float: left;">
   </canvas>
 
-  <div id="api_call_log" 
-    style="border: 1px solid black; float: right; padding-right: 300px; width:600px;%">
-    <table id="actions_table">
-      <tr><th>call</th><th>Action</th></tr>
-      <tr><td>RED</td><td>takeoff</td></tr>
-    </table>
-  </div>
 
   <div style="clear:both">
   </div>
 
   <img id="runway_image" src="{% static '/img/runway.jpg' %}" >
+					</div>
+				</section>
 
-</body>
 
-<script src="{% static '/js/jquery-3.5.1.min.js' %}"></script>
-<script src="{% static '/js/simulator/actions.js' %}"></script>
-<script src="{% static '/js/simulator/simulator.js' %}"></script>
+		<!-- Footer -->
+			<footer id="footer">
+				<div class="container">
+					<ul class="icons">
+						<li><a href="https://www.facebook.com/milorad.kukic.7/" target="_blank" class="icon fa-facebook"></a></li>
+						<li><a href="https://twitter.com/MiloradKukic" target="_blank" class="icon fa-twitter"></a></li>
+						<li><a href="https://www.instagram.com/kukicmilorad/" target="_blank" class="icon fa-instagram"></a></li>
+					</ul>
+				</div>
+			</footer>
 
+		<!-- Scripts -->
+    <link rel="stylesheet" type="text/css" href="{% static "/css/site.css" %}">
+      <script src="{% static '/js/site/jquery.min.js' %}"></script>
+      <script src="{% static '/js/site/skel.min.js' %}"></script>
+      <script src="{% static '/js/site/util.js' %}"></script>
+      <script src="{% static '/js/site/main.js' %}"></script>
+      <script src="{% static '/js/simulator/actions.js' %}"></script>
+      <script src="{% static '/js/simulator/simulator.js' %}"></script>
+
+	</body>
 </html>
