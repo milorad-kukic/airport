@@ -25,13 +25,13 @@ services:
       - redis
 
   db: 
-    image: postgres:10-alpine
+    image: postgres:13.0-alpine
     environment:
       - POSTGRES_DB=airport
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secretpassword
     volumes:
-      - ./pgdata:/var/lib/postresql/data/
+      - pgdata:/var/lib/postgresql/data/
 
   celery:
     build: .
@@ -56,3 +56,6 @@ services:
     
   redis:
     image: redis:6.0.9-alpine
+
+volumes:
+  pgdata:
