@@ -34,7 +34,13 @@ Run the application by typing:
 
 You can now open the Application in your browser at `http://127.0.0.1:8000/` and you can start issuing API calls.
 
+# Crate admin user
 
+In order to login to admin console, you need to create an admin user with following command:
+
+    docker-compose run --rm python sh -c "python manage.py createsuperuser"
+
+You can now open the admin section in your browser at `http://127.0.0.1:8000/admin` and login with a user that you just created.
 
 [build-status-image]: https://travis-ci.com/milorad-kukic/airport.svg?branch=master
 [travis]: https://travis-ci.com/milorad-kukic/airport?branch=master
