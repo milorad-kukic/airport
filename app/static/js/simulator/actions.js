@@ -241,6 +241,17 @@ actions = [
         }
     },
 
+    {
+        description: "GREEN aircraft accidentaly sends invalid request (status instead of state).",
+        url: '/api/' + green_private.call_sign + '/intent/',
+        aircraft: green_private,
+        method: 'intent',
+        data: {
+            status: "APPROACH",
+        },
+        after: function() {
+        }
+    },
 
     {
         description: "SIMULATION FINISHED",
