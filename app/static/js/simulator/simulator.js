@@ -1,4 +1,12 @@
 var simulation_started = false;
+
+function showResponseStatus(stat) {
+  console.log("showResponseStatus called");
+  $("#response_status").text(stat);
+  $("#response_status").show();
+  $("#response_status").delay(1000).fadeOut(800);
+}
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -32,12 +40,17 @@ function sendIntent(action) {
         'X-CSRFToken': csrftoken
       },
       dataType: 'json',
-      success: function(data){
+      success: function(data, textStatus, xhr){
       },
       error: function(error) {
+      },
+      complete: function(xhr, textStatus) {
+          showResponseStatus(xhr.status);
       }
   });
 }
+
+
 
 function sendLocation(action) {
   key = $("#public_key").val();
@@ -62,6 +75,9 @@ function sendLocation(action) {
       success: function(data){
       },
       error: function(error) {
+      },
+      complete: function(xhr, textStatus) {
+          showResponseStatus(xhr.status);
       }
   });
 }
@@ -85,6 +101,9 @@ function newAircraftIntent(callSign, type, state, intent) {
       },
       dataType: 'json',
       success: function(data){
+      },
+      complete: function(xhr, textStatus) {
+          showResponseStatus(xhr.status);
       }
   });
 }
@@ -336,7 +355,6 @@ $("#start_simulation" ).click(function() {
           next_action = -1;
 
           refresh_screen();
-
       }
   });
 
