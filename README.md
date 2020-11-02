@@ -58,6 +58,9 @@ Aircraft communicates send location data by using following API call:
 
     curl --header "Content-Type: application/json" --request POST --data '{"public_key": "{public_key_content}", "type": "AIRLINER", "longitude":"20.455516172478386", "latitude": "44.82128505247063", "altitude": 3500, "heading": 220 }' http://localhost:8000/api/NC9574/location/
 
+Any aircraft known to the system can check weather without providing a public key:
+
+    curl --header "Content-Type: application/json" --request GET http://localhost:8000/api/NC9574/weather/
 
 # Simulator
 
