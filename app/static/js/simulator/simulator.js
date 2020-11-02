@@ -33,10 +33,8 @@ function sendIntent(action) {
       },
       dataType: 'json',
       success: function(data){
-        console.log('success');
       },
       error: function(error) {
-        console.log('error')
       }
   });
 }
@@ -62,10 +60,8 @@ function sendLocation(action) {
       },
       dataType: 'json',
       success: function(data){
-        console.log('success');
       },
       error: function(error) {
-        console.log('error')
       }
   });
 }
@@ -89,7 +85,6 @@ function newAircraftIntent(callSign, type, state, intent) {
       },
       dataType: 'json',
       success: function(data){
-        console.log(data);
       }
   });
 }
@@ -120,6 +115,29 @@ function executeStep(step) {
         }
         action.after();
     }
+
+    if (action.data.state === 'LANDED') {
+        timer = setInterval(()=> {
+          $.get("/api/state_logs/?limit=10", function(data, status){
+            if (data['results']) {
+              for (i = 0; i < data['results'].length; i++) {
+                call_sign = data['results'][i]['call_sign'];
+                state = data['results'][i]['from_state'];
+                intent = data['results'][i]['to_state'];
+                outcome = data['results'][i]['outcome'];
+
+                if(call_sign===blue_airliner.call_sign && state==='LANDED' && 
+                  intent==='PARKED' && outcome==='ACCEPTED') {
+                    blue_airliner.state='PARKED';
+                    refresh_screen();
+                    clearInterval(timer);
+                  }
+              }
+            }
+          });
+
+        }, 5000); 
+    }
 }
 
 function drawImage(ctx, aircraft, x, y) {
@@ -146,6 +164,7 @@ function drawImage(ctx, aircraft, x, y) {
     ctx.font = "10px Arial";
     ctx.fillText("lon: " + aircraft.loc.longitude, x + tr_pos_x, y + tr_pos_y);
     ctx.fillText("lat: " + aircraft.loc.latitude, x + tr_pos_x, y + tr_pos_y + 15);
+    ctx.fillText("alt: " + aircraft.loc.altitude, x + tr_pos_x, y + tr_pos_y + 30);
   }
 }
 
@@ -173,7 +192,7 @@ function draw_aircrafts() {
   // DRAW PARKING
   ctx.font = "15px Arial";
   ctx.fillStyle = "black";
-  ctx.fillText("Small Parking", 380, 20);
+  ctx.fillText("Large Parking", 380, 20);
   for (i=0; i < 6; i++) {
     drawParkingLine(ctx, 40 + i * 25);
   }
@@ -206,47 +225,51 @@ function draw_aircrafts() {
   }
 
   // DRAW GREEN AIRCRAFT
-  if (green_airliner.known) {
+  if (green_private.known) {
       var x = 0;
       var y = 0;
-      if (green_airliner.state==="TAKE_OFF" || green_airliner.state==="LANDED") {
+      if (green_private.state==="TAKE_OFF" || green_private.state==="LANDED") {
           x = 250;
           y = 250;
-      } else if (green_airliner.state==="AIRBORNE") {
+      } else if (green_private.state==="AIRBORNE") {
           x = 300;
           y = 40;
-      } else if (green_airliner.state==="APPROACH") {
+      } else if (green_private.state==="APPROACH") {
           x = 50;
           y = 150;
       }
       ctx.font = "40px Arial";
       ctx.fillStyle = "green";
-      drawImage(ctx, green_airliner, x, y);
+      drawImage(ctx, green_private, x, y);
   }
 
   // DRAW BLUE AIRCRAFT
-  if (blue_private.known) {
+  if (blue_airliner.known) {
       var x = 20;
       var y = 20;
-      if (blue_private.state==="TAKE_OFF" || blue_private.state === "LANDED") {
+      ctx.font = "40px Arial";
+      if (blue_airliner.state==="TAKE_OFF" || blue_airliner.state === "LANDED") {
           x = 250;
           y = 250;
-      } else if (blue_private.state==="AIRBORNE") {
+      } else if (blue_airliner.state==="AIRBORNE") {
           x = 220;
           y = 60;
-      } else if (blue_private.state==="APPROACH") {
+      } else if (blue_airliner.state==="APPROACH") {
           x = 50;
           y = 150;
+      } else {
+          ctx.font = "30px Arial";
+          x = 430;
+          y = 163;
       }
       ctx.fillStyle = "blue";
-      ctx.font = "40px Arial";
-      drawImage(ctx, blue_private, x, y);
+      drawImage(ctx, blue_airliner, x, y);
   }
 
   // DRAW CYAN
   ctx.fillStyle = "cyan";
   ctx.font = "30px Arial";
-  drawImage(ctx, cyan_private, 430, 138);
+  drawImage(ctx, cyan_airliner, 430, 138);
   
 }
 
@@ -284,13 +307,13 @@ $("#start_simulation" ).click(function() {
   red_airliner.known = false;
   delete red_airliner.loc;
 
-  green_airliner.state = 'PARKED';
-  green_airliner.known = false;
-  delete green_airliner.loc;
+  green_private.state = 'PARKED';
+  green_private.known = false;
+  delete green_private.loc;
 
-  blue_private.state = 'AIRBORNE';
-  blue_private.known = false;
-  delete blue_private.loc;
+  blue_airliner.state = 'AIRBORNE';
+  blue_airliner.known = false;
+  delete blue_airliner.loc;
 
   $.ajax({
       url: "/api/simulation/start/", 

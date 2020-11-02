@@ -32,7 +32,7 @@ class StartSimulationApiTests(TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    def test_should_delete_all_aircrafts_and_logs_and_creates_cyan_private_aircraft(self):
+    def test_should_delete_all_aircrafts_and_logs_and_creates_4_private_aircrafts(self):
         aircraft1 = create_aircraft('A1')
         aircraft2 = create_aircraft('A2')
         StateChangeLog.objects.create(
@@ -58,10 +58,10 @@ class StartSimulationApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(Aircraft.objects.all().count(), 1)
+        self.assertEqual(Aircraft.objects.filter(type="AIRLINER").count(), 4)
         self.assertEqual(StateChangeLog.objects.all().count(), 0)
 
-        cyan = Aircraft.objects.first()
+        cyan = Aircraft.objects.get(call_sign='CYAN')
         self.assertEqual(cyan.call_sign, 'CYAN')
         self.assertEqual(cyan.state, 'PARKED')
-        self.assertEqual(cyan.type, 'PRIVATE')
+        self.assertEqual(cyan.type, 'AIRLINER')

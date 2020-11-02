@@ -1,11 +1,11 @@
 CYAN = 'CYAN'
-RED = 'RE2408';
-GREEN = 'GR1234';
-BLUE = 'BL0013';
+RED = 'RED';
+GREEN = 'GREEN';
+BLUE = 'BLUE';
 
-cyan_private = {
+cyan_airliner = {
   call_sign: CYAN,
-  type: 'PRIVATE',
+  type: 'AIRLINER',
   state: 'PARKED',
   known: true
 }
@@ -17,16 +17,16 @@ red_airliner = {
   known: false
 }
 
-green_airliner = {
+green_private = {
   call_sign: GREEN,
-  type: 'AIRLINER',
+  type: 'PRIVATE',
   state: 'PARKED',
   known: false
 }
 
-blue_private = {
+blue_airliner = {
   call_sign: BLUE,
-  type: 'PRIVATE',
+  type: 'AIRLINER',
   state: 'AIRBORNE',
   known: false
 }
@@ -52,8 +52,8 @@ actions = [
 
     {
         description: "CYAN wants to take off, but RED is on the runway",
-        url: '/api/' + cyan_private.call_sign + '/intent/',
-        aircraft: cyan_private,
+        url: '/api/' + cyan_airliner.call_sign + '/intent/',
+        aircraft: cyan_airliner,
         method: 'intent',
         data: {
             state: "TAKE_OFF",
@@ -100,46 +100,46 @@ actions = [
 
     {
         description: "GREEN aircraft that was not know to the system takes off",
-        url: '/api/' + green_airliner.call_sign + '/intent/',
-        aircraft: green_airliner,
+        url: '/api/' + green_private.call_sign + '/intent/',
+        aircraft: green_private,
         method: 'intent',
         data: {
-            type: green_airliner.type,
-            state: green_airliner.state,
+            type: green_private.type,
+            state: green_private.state,
             intent: "TAKE_OFF",
         },
         after: function() {
-            green_airliner.state = "TAKE_OFF";
-            green_airliner.known = true;
+            green_private.state = "TAKE_OFF";
+            green_private.known = true;
         }
     },
 
     {
         description: "GREEN aircraft takes of and becomes AIRBORNE",
-        url: '/api/' + green_airliner.call_sign + '/intent/',
-        aircraft: green_airliner,
+        url: '/api/' + green_private.call_sign + '/intent/',
+        aircraft: green_private,
         method: 'intent',
         data: {
             state: "AIRBORNE",
         },
         after: function() {
-            green_airliner.state = "AIRBORNE";
+            green_private.state = "AIRBORNE";
         }
     },
 
     {
         description: "BLUE aircraft that was not know to the system APPROACHES",
-        url: '/api/' + blue_private.call_sign + '/intent/',
-        aircraft: blue_private,
+        url: '/api/' + blue_airliner.call_sign + '/intent/',
+        aircraft: blue_airliner,
         method: 'intent',
         data: {
-            type: blue_private.type,
-            state: blue_private.state,
+            type: blue_airliner.type,
+            state: blue_airliner.state,
             intent: "APPROACH",
         },
         after: function() {
-            blue_private.state = "APPROACH";
-            blue_private.known = true;
+            blue_airliner.state = "APPROACH";
+            blue_airliner.known = true;
         }
     },
 
@@ -158,14 +158,14 @@ actions = [
 
     {
         description: "BLUE lands",
-        url: '/api/' + blue_private.call_sign + '/intent/',
-        aircraft: blue_private,
+        url: '/api/' + blue_airliner.call_sign + '/intent/',
+        aircraft: blue_airliner,
         method: 'intent',
         data: {
             state: "LANDED",
         },
         after: function() {
-            blue_private.state = 'LANDED'
+            blue_airliner.state = 'LANDED'
         }
     },
 
@@ -196,8 +196,8 @@ actions = [
 
     {
         description: "GREEN aircraft tries to approach but RED is already approaching",
-        url: '/api/' + green_airliner.call_sign + '/intent/',
-        aircraft: green_airliner,
+        url: '/api/' + green_private.call_sign + '/intent/',
+        aircraft: green_private,
         method: 'intent',
         data: {
             state: "APPROACH",
@@ -208,18 +208,18 @@ actions = [
 
     {
         description: "GREEN aircraft sends its location",
-        url: '/api/' + green_airliner.call_sign + '/location/',
-        aircraft: green_airliner,
+        url: '/api/' + green_private.call_sign + '/location/',
+        aircraft: green_private,
         method: 'location',
         data: {
-            type: "AIRLINER",
+            type: "PRIVATE",
             longitude: "20.455516172478386",
             latitude: "44.82128505247063",
             altitude: 3670,
             heading: 250
         },
         after: function() {
-            green_airliner.loc = {
+            green_private.loc = {
                 type: "AIRLINER",
                 longitude: "20.455516172478386",
                 latitude: "44.82128505247063",
@@ -228,6 +228,19 @@ actions = [
             }
         }
     },
+
+    {
+        description: "RED wants to land but runway is taken or no parking places",
+        url: '/api/' + red_airliner.call_sign + '/intent/',
+        aircraft: red_airliner,
+        method: 'intent',
+        data: {
+            state: "LANDED",
+        },
+        after: function() {
+        }
+    },
+
 
     {
         description: "SIMULATION FINISHED",

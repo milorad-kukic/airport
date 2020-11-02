@@ -414,6 +414,7 @@ class AircraftPrivateApiTests(TestCase):
         self.assertIsNone(res.data)
         self.assertTrue(Aircraft.objects.filter(call_sign=NEW_CALL_SIGN).exists())
 
+
 class AircraftLocationTests(TestCase):
 
     def setUp(self):

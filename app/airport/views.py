@@ -128,9 +128,9 @@ class StartSimulationViewSet(viewsets.GenericViewSet):
             url_name='start_simulation')
     def start_simulation(self, request, *args):
         Aircraft.objects.all().delete()
-        Aircraft.objects.create(
-            call_sign='CYAN',
-            type="PRIVATE",
-            state="PARKED"
-        )
+        # Create test aircrafts
+        Aircraft.objects.create(call_sign='CYAN', type="AIRLINER", state="PARKED")
+        Aircraft.objects.create(call_sign='PA_001', type="AIRLINER", state="PARKED")
+        Aircraft.objects.create(call_sign='PA_002', type="AIRLINER", state="PARKED")
+        Aircraft.objects.create(call_sign='PA_003', type="AIRLINER", state="PARKED")
         return Response()
