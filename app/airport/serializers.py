@@ -113,9 +113,8 @@ class AircraftSerializer(serializers.ModelSerializer):
         else:
             type_to_check = self.db_object.type
 
-        parking_taken_count = Aircraft.objects.filter(type=type_to_check).count()
-        if self.db_object:
-            parking_taken_count -= 1
+        parking_taken_count = Aircraft.objects.filter(
+                type=type_to_check, state='PARKED').count()
 
         if type_to_check == 'AIRLINER':
             PARKING_PLACES = 10

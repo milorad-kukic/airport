@@ -393,6 +393,26 @@ class AircraftPrivateApiTests(TestCase):
         self.assertIsNone(res.data)
         self.assertFalse(Aircraft.objects.filter(call_sign=NEW_CALL_SIGN).exists())
 
+    @override_settings(AIRPORT_LARGE_PARKING_SPOTS=3)
+    def test_new_aircraft_can_approach_if_one_parking_spot_is_empty(self):
+        create_aircraft(call_sign='cs1', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs2', state='PARKED', type='AIRLINER')
+        create_aircraft(call_sign='cs3', state='AIRBORNE', type='AIRLINER')
+
+        NEW_CALL_SIGN = 'MK2408'
+
+        payload = {
+            'type': 'AIRLINER',
+            'state': 'AIRBORNE',
+            'intent': 'APPROACH',
+            'public_key': 'valid public key'
+        }
+
+        res = self.client.post(f'/api/{NEW_CALL_SIGN}/intent/', payload)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertIsNone(res.data)
+        self.assertTrue(Aircraft.objects.filter(call_sign=NEW_CALL_SIGN).exists())
 
 class AircraftLocationTests(TestCase):
 
