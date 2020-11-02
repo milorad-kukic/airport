@@ -1,6 +1,14 @@
+CYAN = 'CYAN'
 RED = 'RE2408';
 GREEN = 'GR1234';
 BLUE = 'BL0013';
+
+cyan_private = {
+  call_sign: CYAN,
+  type: 'PRIVATE',
+  state: 'PARKED',
+  known: true
+}
 
 red_airliner = {
   call_sign: RED,
@@ -43,6 +51,18 @@ actions = [
     },
 
     {
+        description: "CYAN wants to take off, but RED is on the runway",
+        url: '/api/' + cyan_private.call_sign + '/intent/',
+        aircraft: cyan_private,
+        method: 'intent',
+        data: {
+            state: "TAKE_OFF",
+        },
+        after: function() {
+        }
+    },
+
+    {
         description: "RED aircraft signals that is airborne",
         url: '/api/' + red_airliner.call_sign + '/intent/',
         aircraft: red_airliner,
@@ -68,6 +88,13 @@ actions = [
             heading: 220
         },
         after: function() {
+            red_airliner.loc = {
+                type: "AIRLINER",
+                longitude: "20.455516172478386",
+                latitude: "44.82128505247063",
+                altitude: 2800,
+                heading: 220
+            }
         }
     },
 
@@ -176,6 +203,29 @@ actions = [
             state: "APPROACH",
         },
         after: function() {
+        }
+    },
+
+    {
+        description: "GREEN aircraft sends its location",
+        url: '/api/' + green_airliner.call_sign + '/location/',
+        aircraft: green_airliner,
+        method: 'location',
+        data: {
+            type: "AIRLINER",
+            longitude: "20.455516172478386",
+            latitude: "44.82128505247063",
+            altitude: 3670,
+            heading: 250
+        },
+        after: function() {
+            green_airliner.loc = {
+                type: "AIRLINER",
+                longitude: "20.455516172478386",
+                latitude: "44.82128505247063",
+                altitude: 3670,
+                heading: 250
+            }
         }
     },
 

@@ -60,7 +60,7 @@ You can visit `http://localhost:8000/simulator/` and see API in action without f
 
 In order to have best experience, you can open two browser windows side by side. In one you open an admin console at `http://127.0.0.1:8000/admin` and in other open a simulator at `http://localhost:8000/simulator/`. In simulator you need to provide a public key which is required by the API. Do it by copying a content of the public key into appropriate field.
 
-**When you start the simulation, all aircraft data and logs data will be deleted !!!**
+**When you start the simulation, all existing aircraft data and logs data will be deleted and one aircraft will be created!!!**
 
 By executing next step you will perform an action described bellow "EXECUTE NEXT STEP" button. State change log will appear in admin console which check for new logs every 10 seconds.
 
