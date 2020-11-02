@@ -14,6 +14,18 @@ STATE_FLOW = {
 }
 
 
+def get_setting(key, default):
+    """
+    Utility method to easier access settings attributes and return
+    default value if key not found in settings.
+
+    key needs to be sent as a string. For example:
+    get_setting('AIRPORT_LARGE_PARKING_SPOTS', 10)
+    """
+
+    return getattr(settings, key, default)
+
+
 class AircraftSerializer(serializers.ModelSerializer):
 
     type = serializers.CharField(allow_null=True)
@@ -76,9 +88,7 @@ class AircraftSerializer(serializers.ModelSerializer):
                     state__in=[Aircraft.TAKE_OFF, Aircraft.LANDED]
             ).count()
 
-            RUNWAY_CONT = 1
-            if settings.AIRPORT_RUNAWAYS:
-                RUNWAY_CONT = settings.AIRPORT_RUNAWAYS
+            RUNWAY_CONT = get_setting('AIRPORT_RUNAWAYS', 1)
 
             if on_runway > RUNWAY_CONT - 1:
                 from_state = ''
@@ -117,13 +127,9 @@ class AircraftSerializer(serializers.ModelSerializer):
                 type=type_to_check, state='PARKED').count()
 
         if type_to_check == 'AIRLINER':
-            PARKING_PLACES = 10
-            if settings.AIRPORT_LARGE_PARKING_SPOTS:
-                PARKING_PLACES = settings.AIRPORT_LARGE_PARKING_SPOTS
+            PARKING_PLACES = get_setting('AIRPORT_LARGE_PARKING_SPOTS', 10)
         else:
-            PARKING_PLACES = 5
-            if settings.AIRPORT_SMALL_PARKING_SPOTS:
-                PARKING_PLACES = settings.AIRPORT_SMALL_PARKING_SPOTS
+            PARKING_PLACES = get_setting('AIRPORT_SMALL_PARKING_SPOTS', 5)
 
         if parking_taken_count >= PARKING_PLACES:
             from_state = ''
