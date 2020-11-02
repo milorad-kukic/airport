@@ -6,6 +6,7 @@ from django.views.decorators.cache import never_cache
 from airport.models import Aircraft, StateChangeLog
 
 from weather.models import WeatherData
+from weather.tasks import load_weather_data
 
 
 class AirportAdminSite(sites.AdminSite):
@@ -25,6 +26,8 @@ class AirportAdminSite(sites.AdminSite):
         taken_large_percent = round((parked_large_count / settings.AIRPORT_LARGE_PARKING_SPOTS) * 100)
 
         weather_data = WeatherData.objects.first()
+        if not weather_data:
+            load_weather_data.delay()
 
         extra_context = {
             'LARGE_PARKING_SPOTS': settings.AIRPORT_LARGE_PARKING_SPOTS,
