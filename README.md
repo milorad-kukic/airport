@@ -18,6 +18,13 @@ Following tools are used for this application:
 * Celery
 * Redis
 
+# Prerequisites
+
+Make sure that you have installed:
+* git
+* docker
+* docker-compose
+
 # Running the app
 
 Make sure that you have installed **Docker** and **docker-compose**.
