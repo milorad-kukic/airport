@@ -82,7 +82,7 @@ class AircraftViewSet(viewsets.GenericViewSet):
 
         return response
 
-    @action(methods=['post'], detail=False,
+    @action(methods=['put'], detail=False,
             url_path='(?P<call_sign>[^/.]+)/location',
             url_name='location')
     def location(self, request, call_sign=None, pk=None):

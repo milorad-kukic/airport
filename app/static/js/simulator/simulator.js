@@ -59,7 +59,7 @@ function sendLocation(action) {
 
   $.ajax({
       url: "/api/"+action.aircraft.call_sign+"/location/", 
-      type: "post",
+      type: "put",
       data: {
           public_key: key,
           type: action.data.type,

@@ -439,7 +439,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
@@ -458,7 +458,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
@@ -477,7 +477,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -496,7 +496,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -514,7 +514,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -532,7 +532,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -550,7 +550,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -568,7 +568,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -586,7 +586,7 @@ class AircraftLocationTests(TestCase):
             'public_key': 'dummy_public_key_that_we_consider_valid'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -617,7 +617,7 @@ class LocationApiInvalidKeyTests(TestCase):
             'public_key': 'INVALID KEY'
         }
 
-        res = self.client.post(f'/api/{CALL_SIGN}/location/', payload)
+        res = self.client.put(f'/api/{CALL_SIGN}/location/', payload)
 
         saved_aircraft = Aircraft.objects.get(call_sign=CALL_SIGN)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
