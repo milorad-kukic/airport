@@ -131,21 +131,21 @@ function draw_aircrafts() {
 
   // DRAW RUNWAY
   var img = document.getElementById("runway_image");
-  ctx.drawImage(img, 250, 300);
+  ctx.drawImage(img, 200, 200);
 
   // DRAW RED AIRCRAFT
   if (red_airliner.known) {
       var x = 20;
       var y = 20;
       if (red_airliner.state==="TAKE_OFF" || red_airliner.state==="LANDED") {
-          x = 270;
-          y = 340;
+          x = 220;
+          y = 240;
       } else if (red_airliner.state=="AIRBORNE") {
-          x = 260;
+          x = 210;
           y = 60;
       } else if (red_airliner.state==="APPROACH") {
-          x = 100;
-          y = 200;
+          x = 50;
+          y = 150;
       }
       ctx.font = "40px Arial";
       ctx.fillStyle = "red";
@@ -157,14 +157,14 @@ function draw_aircrafts() {
       var x = 20;
       var y = 20;
       if (green_airliner.state==="TAKE_OFF" || green_airliner.state==="LANDED") {
-          x = 270;
-          y = 340;
+          x = 220;
+          y = 240;
       } else if (green_airliner.state==="AIRBORNE") {
-          x = 300;
+          x = 250;
           y = 60;
       } else if (green_airliner.state==="APPROACH") {
-          x = 100;
-          y = 200;
+          x = 50;
+          y = 150;
       }
       ctx.font = "40px Arial";
       ctx.fillStyle = "green";
@@ -176,14 +176,14 @@ function draw_aircrafts() {
       var x = 20;
       var y = 20;
       if (blue_private.state==="TAKE_OFF" || blue_private.state === "LANDED") {
-          x = 270;
-          y = 340;
+          x = 220;
+          y = 240;
       } else if (blue_private.state==="AIRBORNE") {
           x = 220;
           y = 60;
       } else if (blue_private.state==="APPROACH") {
-          x = 100;
-          y = 200;
+          x = 50;
+          y = 150;
       }
       ctx.font = "40px Arial";
       ctx.fillStyle = "blue";
