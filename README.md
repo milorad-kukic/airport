@@ -54,6 +54,11 @@ After initial communication, aircraft can send data just by providing call sign:
 
     curl --header "Content-Type: application/json" --request POST --data '{"public_key": "{public_key_content}", "state": "AIRBORNE" }' http://localhost:8000/api/NC9574/intent/
 
+Aircraft communicates send location data by using following API call:
+
+    curl --header "Content-Type: application/json" --request POST --data '{"public_key": "{public_key_content}", "type": "AIRLINER", "longitude":"20.455516172478386", "latitude": "44.82128505247063", "altitude": 3500, "heading": 220 }' http://localhost:8000/api/NC9574/location/
+
+
 # Simulator
 
 You can visit `http://localhost:8000/simulator/` and see API in action without forming these call manually. Intent was to give you a good insight of what calls were sent and how it affects the state of the app.
